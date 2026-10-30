@@ -1,7 +1,7 @@
 // Renders the README screenshots of the extension at work, into docs/images/:
 //
 //   google-home.png      https://www.google.com/ with the extension loaded
-//   google-results.png   a results page for "zambodi search" (replay only, see below)
+//   google-results.png   a results page for "zambodi search" (replayed, see below)
 //   newtab.png           the extension's new tab page, at 1280x420 so it fills the frame
 //   popup.png            the toolbar popup at its natural size
 //   before-after.png     google.com without the extension beside google.com with it
@@ -13,24 +13,23 @@
 // Loads the unpacked extension from the repository root into a persistent
 // profile under docs/src/profile/ (gitignored). The manifest key pins the
 // extension id, so the new tab page and popup are addressed directly. If
-// Google serves its "unusual traffic" page, that image is skipped with a
-// message and the committed one is left alone. Only when no file exists yet
-// at that path does it write a plainly labelled "screenshot pending" card, so
-// the README never shows a broken image. The script exits 3 whenever it
-// skipped something. Set CHROMIUM_PATH to use another browser binary.
+// Google serves its "unusual traffic" page for google-home or before-after,
+// that image is skipped with a message, the committed one is left alone and
+// the script exits 3. Set CHROMIUM_PATH to use another browser binary.
 //
 // Google serves automated browsers its "unusual traffic" page on /search, so
-// google-results needs a results page saved from a normal browser (Chrome:
-// Ctrl+S, "Webpage, HTML Only"; docs/src/out/ is gitignored and a good place
-// for it). Point ZAMBODI_RESULTS_HTML at that file and
-// navigations to https://www.google.com/search are answered with it (see
-// routeResults in lib.mjs):
+// google-results never loads a real one. Navigations to
+// https://www.google.com/search are answered with the bundled mock
+// docs/src/google-results-mock.html (see routeResults in lib.mjs), and the
+// extension rebrands it with its real content scripts. To replay a results
+// page saved from a normal browser instead (Chrome: Ctrl+S, "Webpage, HTML
+// Only"; docs/src/out/ is gitignored and a good place for it), point
+// ZAMBODI_RESULTS_HTML at it:
 //
 //   ZAMBODI_RESULTS_HTML=docs/src/out/google-results.html node docs/src/render-screenshots.mjs google-results
 
-import fs from 'node:fs'
 import path from 'node:path'
-import { blockedMessage, ensureDir, extensionUrl, FONTS, gotoGoogle, images, launchProfile, missingFonts, replayOptions, resultsReplay, routeResults } from './lib.mjs'
+import { blockedMessage, ensureDir, extensionUrl, FONTS, gotoGoogle, images, launchProfile, missingFonts, replayOptions, resultsNote, routeResults } from './lib.mjs'
 
 const ALL = ['google-home', 'google-results', 'newtab', 'popup', 'before-after']
 const wanted = process.argv.slice(2).length ? process.argv.slice(2) : ALL
@@ -42,7 +41,8 @@ const done = [], skipped = []
 const wrote = name => { done.push(name); console.log(path.relative(process.cwd(), out(name))) }
 
 const context = await launchProfile('with-extension', replayOptions)
-if (await routeResults(context)) console.log(`replaying ${path.relative(process.cwd(), resultsReplay)} for google.com/search`)
+await routeResults(context)
+console.log(resultsNote())
 const page = context.pages()[0] || await context.newPage()
 let withShot = null
 
@@ -57,14 +57,10 @@ if (wanted.includes('google-home') || wanted.includes('before-after')) {
 }
 
 if (wanted.includes('google-results')) {
-  if (await gotoGoogle(page, 'https://www.google.com/search?q=zambodi+search&hl=en') === 'blocked') {
-    console.warn(blockedMessage('google-results'))
-    if (!resultsReplay) console.warn('  to render it from a results page saved in your browser, set ZAMBODI_RESULTS_HTML (see the top of this script)')
-    skipped.push('google-results')
-  } else {
-    await page.screenshot({ path: out('google-results'), animations: 'disabled' })
-    wrote('google-results')
-  }
+  await page.goto('https://www.google.com/search?q=zambodi+search&hl=en', { waitUntil: 'load' })
+  await page.waitForTimeout(1500)
+  await page.screenshot({ path: out('google-results'), animations: 'disabled' })
+  wrote('google-results')
 }
 
 if (wanted.includes('newtab')) {
@@ -132,36 +128,6 @@ async function composeBeforeAfter(before, after) {
   const missing = await missingFonts(p, FONTS)
   if (missing.length) { await ctx.close(); throw new Error(`fonts did not load: ${missing.join(', ')}; before-after not written`) }
   await p.screenshot({ path: out('before-after'), animations: 'disabled' })
-  await ctx.close()
-}
-
-for (const name of new Set(skipped)) {
-  if (!fs.existsSync(out(name))) {
-    await writePending(name)
-    console.warn(`  wrote a "screenshot pending" card to ${path.relative(process.cwd(), out(name))}; rerun to replace it`)
-  }
-}
-
-async function writePending(name) {
-  const ctx = await launchProfile('compose', { withExtension: false, viewport: { width: 1280, height: 800 } })
-  const p = ctx.pages()[0] || await ctx.newPage()
-  await p.setContent(`<!doctype html><html><head><meta charset="utf-8">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Arimo:wght@400;700&display=swap">
-<style>
-  * { margin: 0; } body { width: 1280px; height: 800px; display: grid; place-items: center; text-align: center;
-  background: repeating-linear-gradient(45deg, #f4f7fc 0 24px, #e9eef6 24px 48px); font-family: Arimo, sans-serif; color: #444; }
-  h1 { font: 700 44px 'Libre Baskerville', serif; color: #222; margin-bottom: 18px; } code { font-size: 18px; white-space: nowrap; background: #fff; padding: 4px 10px; border: 1px solid #b9c4d6; }
-  p { font-size: 22px; margin-bottom: 22px; }
-</style></head><body><div>
-<h1>Screenshot pending: ${name}</h1>
-${name === 'google-results'
-  ? `<p>Google blocks automated browsers on results pages. Save one from your browser, then:</p>
-<code>ZAMBODI_RESULTS_HTML=docs/src/out/google-results.html node docs/src/render-screenshots.mjs ${name}</code>`
-  : `<p>Google showed its "unusual traffic" page when this was rendered.</p>
-<code>node docs/src/render-screenshots.mjs ${name}</code>`}
-</div></body></html>`, { waitUntil: 'networkidle' })
-  await missingFonts(p, FONTS)
-  await p.screenshot({ path: out(name) })
   await ctx.close()
 }
 

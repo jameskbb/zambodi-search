@@ -12,6 +12,19 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
-      - run: scripts/check.sh
-      - run: scripts/package.sh
+          node-version: '24'
+          check-latest: true
+      - name: Versions
+        run: node --version && npm --version && python3 --version
+      - name: Install test dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Check
+        run: bash scripts/check.sh
+      - name: Package
+        run: bash scripts/package.sh
+      - name: Keep the build
+        uses: actions/upload-artifact@v4
+        with:
+          name: zambodi-search-extension
+          path: dist/*.zip
+          if-no-files-found: error

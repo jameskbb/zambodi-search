@@ -4,12 +4,10 @@
 //   npm --prefix docs/src install          # once: playwright-core, pinned in docs/src
 //   node docs/src/record-demo.mjs          # from the repository root
 //
-// Records at 1280x800 in a persistent profile with the unpacked extension.
-// With a results page available the demo is: the new tab page, typing
-// "zambodi search" and pressing Enter, the rebranded results page with a hover
-// on the small logo, google.com with a hover on its logo, then the popup
-// toggled off and on (about 22 seconds). Without one, the typing and results
-// are left out: the new tab page, google.com and the popup (about 13 seconds).
+// Records at 1280x800 in a persistent profile with the unpacked extension:
+// the new tab page, typing "zambodi search" and pressing Enter, the rebranded
+// results page with a hover on the small logo, google.com with a hover on its
+// logo, then the popup toggled off and on.
 // The raw webm lands in docs/src/out/ (gitignored); ffmpeg turns it into a
 // palette-optimised 960px GIF at 11 fps and an H.264 yuv420p faststart MP4.
 //
@@ -19,16 +17,16 @@
 // build works, for example the one in the imageio-ffmpeg Python package.
 //
 // Results pages: Google serves automated browsers its "unusual traffic" page
-// on /search. Set ZAMBODI_RESULTS_HTML to a results page saved from a normal
-// browser and navigations to https://www.google.com/search are answered with
-// it (see routeResults in lib.mjs). Without it the script probes Google once
-// in a separate profile and records the results segment only if Google
-// answers. Set CHROMIUM_PATH to use another browser binary.
+// on /search, so navigations to https://www.google.com/search are answered
+// with the bundled mock docs/src/google-results-mock.html, or with the file
+// ZAMBODI_RESULTS_HTML names, such as a results page saved from a normal
+// browser (see routeResults in lib.mjs). Set CHROMIUM_PATH to use another
+// browser binary.
 
 import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
-import { ensureDir, extensionUrl, gotoGoogle, here, isBlocked, launchProfile, replayOptions, require, resultsReplay, root, routeResults } from './lib.mjs'
+import { ensureDir, extensionUrl, gotoGoogle, here, launchProfile, replayOptions, require, resultsNote, root, routeResults } from './lib.mjs'
 
 const GIF = path.join(root, 'docs', 'images', 'demo.gif')
 const MP4 = path.join(root, 'docs', 'demo.mp4')
@@ -81,20 +79,7 @@ function findFfmpeg() {
 const ffmpeg = findFfmpeg()
 console.log(`ffmpeg: ${ffmpeg}`)
 
-// ---- can we reach a results page? ----------------------------------------
-// With a saved page to replay, yes. Otherwise check in a separate, unrecorded
-// profile so a block never lands in the video.
-
-let resultsOk = true
-if (resultsReplay) {
-  console.log(`replaying ${rel(resultsReplay)} for google.com/search`)
-} else {
-  const probe = await launchProfile('probe')
-  const probePage = probe.pages()[0] || await probe.newPage()
-  resultsOk = await gotoGoogle(probePage, 'https://www.google.com/search?q=zambodi+search&hl=en', 0) === 'ok'
-  await probe.close()
-  if (!resultsOk) console.warn('NOTE: Google served its "unusual traffic" page; the demo leaves out the search and the results page. Set ZAMBODI_RESULTS_HTML to include them.')
-}
+console.log(resultsNote())
 
 // ---- record ---------------------------------------------------------------
 
@@ -172,36 +157,26 @@ await page.evaluate(() => document.fonts.ready)
 const startAt = (Date.now() - t0) / 1000
 await pause(1500)
 
-// 2. Type the query slowly and submit. Only when the results page will be
-// shown: a query typed and never submitted would be a dead end in the demo.
-if (resultsOk) {
-  const box = await firstVisible(['#q', 'input[name="q"]', 'input[type="search"]', 'input[type="text"]', 'textarea'])
-  if (box) {
-    const c = await centre(box)
-    await glide(c.x, c.y)
-    await box.click()
-    await page.keyboard.type('zambodi search', { delay: 140 })
-    await pause(700)
-    await Promise.all([page.waitForNavigation({ waitUntil: 'load' }).catch(() => null), page.keyboard.press('Enter')])
-    await refit()
-  } else {
-    skippedSteps.push('typing (no search box on the new tab page)')
-    await go('https://www.google.com/search?q=zambodi+search&hl=en')
-  }
-
-  // 3. Rebranded results, a hover on the small logo, a little scroll.
-  if (await isBlocked(page)) {
-    await context.close()
-    console.error('Google served its "unusual traffic" page during recording; nothing written. Rerun, or set ZAMBODI_RESULTS_HTML.')
-    process.exit(1)
-  }
-  await pause(1800)
-  await hoverLogo()
-  await page.mouse.wheel(0, 500); await pause(1300)
-  await page.mouse.wheel(0, -500); await pause(800)
+// 2. Type the query slowly and submit.
+const box = await firstVisible(['#q', 'input[name="q"]', 'input[type="search"]', 'input[type="text"]', 'textarea'])
+if (box) {
+  const c = await centre(box)
+  await glide(c.x, c.y)
+  await box.click()
+  await page.keyboard.type('zambodi search', { delay: 140 })
+  await pause(700)
+  await Promise.all([page.waitForNavigation({ waitUntil: 'load' }).catch(() => null), page.keyboard.press('Enter')])
+  await refit()
 } else {
-  skippedSteps.push('search and results page (blocked)')
+  skippedSteps.push('typing (no search box on the new tab page)')
+  await go('https://www.google.com/search?q=zambodi+search&hl=en')
 }
+
+// 3. Rebranded results, a hover on the small logo, a little scroll.
+await pause(1800)
+await hoverLogo()
+await page.mouse.wheel(0, 500); await pause(1300)
+await page.mouse.wheel(0, -500); await pause(800)
 
 // 4. google.com itself.
 await gotoGoogle(page, 'https://www.google.com/?hl=en', 0)

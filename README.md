@@ -10,7 +10,7 @@ the address bar offers to "Search Zambodi". The searching itself is still done
 by Google; Zambodi just takes the credit. It is a parody with no affiliation to
 Google, makes no network calls of its own and has one switch to turn it off.
 
-![Demo: the Zambodi new tab page, then google.com with the Zambodi wordmark in place of the Google logo, then the toolbar popup switched off and on again](docs/images/demo.gif)
+![Demo: "zambodi search" typed into the Zambodi new tab page and submitted, the bundled mock results page rebranded with the small Zambodi wordmark, which the pointer hovers before the page scrolls down and back, then google.com with the Zambodi wordmark in place of the Google logo, then the toolbar popup switched off and on again](docs/images/demo.gif)
 
 The same demo as video: [docs/demo.mp4](docs/demo.mp4).
 
@@ -82,13 +82,14 @@ The google.com homepage, rebranded:
 
 ![google.com with the Zambodi wordmark in place of the Google logo, a search box and a "Zambodi Search" button](docs/images/google-home.png)
 
-A results page for "zambodi search" is still pending. Google's bot check
-blocks automated browsers on search results, so this screenshot is produced
-from a results page saved in a normal browser (see `ZAMBODI_RESULTS_HTML` in
-[Regenerate the images](#regenerate-the-images)). Until one has been saved,
-the image is a placeholder card:
+A results page for "zambodi search". Google's bot check blocks automated
+browsers on search results, so this is a mock results page bundled with the
+repository (`docs/src/google-results-mock.html`, every result fictional),
+rendered through the extension's real content scripts. Setting
+`ZAMBODI_RESULTS_HTML` replays a real saved results page instead (see
+[Regenerate the images](#regenerate-the-images)):
 
-![Placeholder card reading "Screenshot pending: google-results", with the command that renders it from a saved results page](docs/images/google-results.png)
+![A mock Google results page for "zambodi search", rebranded by the extension: the Zambodi wordmark in the header, fictional results about Zambodi, and "Google" rewritten to "Zambodi" in the titles, snippets, questions and footer](docs/images/google-results.png)
 
 The toolbar popup:
 
@@ -161,12 +162,13 @@ FFMPEG_PATH=/path/to/ffmpeg node docs/src/record-demo.mjs   # docs/images/demo.g
   palette filters. Set `FFMPEG_PATH`, or put `ffmpeg` on your `PATH`. The
   ffmpeg that Playwright downloads only encodes VP8 and is not enough; the
   script says so before recording anything.
-- `ZAMBODI_RESULTS_HTML` names a Google results page saved from Chrome
-  (Ctrl+S, "Webpage, HTML Only"), for example
-  `docs/src/out/google-results.html`, which is gitignored. With it set,
-  `render-screenshots.mjs` and `record-demo.mjs` answer navigations to
-  `https://www.google.com/search` with that file, so the results screenshot
-  is rendered and the demo gains a search and the rebranded results page.
+- Results pages never come from Google, whose bot check blocks automated
+  browsers: `render-screenshots.mjs` and `record-demo.mjs` answer navigations
+  to `https://www.google.com/search` with the bundled mock
+  `docs/src/google-results-mock.html`, and the extension rebrands it with its
+  real content scripts. `ZAMBODI_RESULTS_HTML` names a results page saved
+  from Chrome (Ctrl+S, "Webpage, HTML Only"), for example
+  `docs/src/out/google-results.html`, which is gitignored, to replay instead.
 - `CHROMIUM_PATH` points any of the scripts at a different Chromium binary.
 - The title card and headers need the Libre Baskerville and Arimo web fonts;
   if they fail to load, nothing is written.

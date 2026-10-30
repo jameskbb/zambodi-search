@@ -59,32 +59,39 @@ export async function launchProfile(name, { withExtension = true, ...options } =
   return context
 }
 
-// Replay mode. Google answers automated browsers on /search with its "unusual
-// traffic" page, so a results page can only be shown from a copy the
-// maintainer saved in their own browser (Chrome: Ctrl+S, "Webpage, HTML Only").
-// When ZAMBODI_RESULTS_HTML names that file, every top-level navigation to
-// https://www.google.com/search is answered with it, so the extension runs on
-// a real google.com results page. Subresources still load from Google.
-export const resultsReplay = process.env.ZAMBODI_RESULTS_HTML ? path.resolve(process.env.ZAMBODI_RESULTS_HTML) : null
-if (resultsReplay && !fs.existsSync(resultsReplay)) {
-  console.error(`ZAMBODI_RESULTS_HTML: ${resultsReplay} does not exist`)
+// Results pages. Google answers automated browsers on /search with its
+// "unusual traffic" page, so the scripts never load a real one: every
+// top-level navigation to https://www.google.com/search is answered with a
+// local file, and the extension's real content scripts run on it. By default
+// that file is docs/src/google-results-mock.html, a fictional results page
+// written for these images. ZAMBODI_RESULTS_HTML names another file to replay
+// instead, such as a real results page saved from a normal browser (Chrome:
+// Ctrl+S, "Webpage, HTML Only"); its subresources still load from Google.
+export const bundledResults = path.join(here, 'google-results-mock.html')
+export const resultsReplay = process.env.ZAMBODI_RESULTS_HTML ? path.resolve(process.env.ZAMBODI_RESULTS_HTML) : bundledResults
+export const resultsIsMock = !process.env.ZAMBODI_RESULTS_HTML
+if (!fs.existsSync(resultsReplay)) {
+  console.error(`${resultsIsMock ? 'bundled results mock' : 'ZAMBODI_RESULTS_HTML'}: ${resultsReplay} does not exist`)
   process.exit(2)
 }
 
-// Launch options for a context that replays the saved page: service workers
-// are blocked so every navigation reaches the route below.
-export const replayOptions = resultsReplay ? { serviceWorkers: 'block' } : {}
+// One line saying which results page the run replays.
+export const resultsNote = () => resultsIsMock
+  ? `results page: the bundled mock ${path.relative(process.cwd(), resultsReplay)} (set ZAMBODI_RESULTS_HTML to replay a saved page)`
+  : `results page: replaying ${path.relative(process.cwd(), resultsReplay)} for google.com/search`
 
-// Installs the replay route on a context. Returns false when replay is off.
+// Launch options for a context that replays results: service workers are
+// blocked so every navigation reaches the route below.
+export const replayOptions = { serviceWorkers: 'block' }
+
+// Installs the replay route on a context.
 export async function routeResults(context) {
-  if (!resultsReplay) return false
   const body = fs.readFileSync(resultsReplay)
   await context.route(/^https:\/\/www\.google\.com\/search(?:[?#]|$)/, route => {
     const req = route.request()
     if (req.isNavigationRequest() && !req.frame().parentFrame()) return route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body })
     return route.continue()
   })
-  return true
 }
 
 // Opens url, getting past Google's consent interstitial if one appears.

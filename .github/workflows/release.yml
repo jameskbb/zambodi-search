@@ -1,6 +1,7 @@
 name: Release
 # Pushing a tag v<version> builds the extension zip and opens a DRAFT release
 # with the matching docs/release-notes/v<version>.md. The maintainer publishes it.
+# Re-pushing the same tag replaces an existing draft; a published release is never touched.
 on:
   push:
     tags: ['v*']
@@ -13,18 +14,36 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: '24'
+          check-latest: true
+      - name: Versions
+        run: node --version && npm --version && python3 --version
       - name: Tag must match manifest.json version
         run: |
           v=$(node -p "require('./manifest.json').version")
           [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "tag $GITHUB_REF_NAME but manifest says $v"; exit 1; }
           [ -f "docs/release-notes/$GITHUB_REF_NAME.md" ] || { echo "missing docs/release-notes/$GITHUB_REF_NAME.md"; exit 1; }
-      - run: scripts/check.sh
-      - run: scripts/package.sh
+      - name: Install test dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Check
+        run: bash scripts/check.sh
+      - name: Package
+        run: bash scripts/package.sh
+      - name: Keep the build
+        uses: actions/upload-artifact@v4
+        with:
+          name: zambodi-search-${{ github.ref_name }}
+          path: dist/*.zip
+          if-no-files-found: error
       - name: Draft the release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          if gh release view "$GITHUB_REF_NAME" --json isDraft --jq .isDraft 2>/dev/null | grep -q true; then
+            gh release delete "$GITHUB_REF_NAME" --yes
+          elif gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "release $GITHUB_REF_NAME is already published; not touching it"; exit 0
+          fi
           gh release create "$GITHUB_REF_NAME" dist/*.zip --draft \
             --title "Zambodi Search $GITHUB_REF_NAME" \
             --notes-file "docs/release-notes/$GITHUB_REF_NAME.md"
