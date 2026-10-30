@@ -21,6 +21,9 @@ docs/src/profile/
 # Local word list for scripts/check.sh
 scripts/blocklist.local.txt
 
+# Local design-hook configuration
+.impeccable/
+
 # Local agent context stays out of public commits.
 CLAUDE.md
 AGENTS.md
