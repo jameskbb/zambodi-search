@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Zambodi Search",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Rebrands Google as Zambodi: the word on every page, the google.com logo, the favicon and tab title, a 2000s-style new tab page and an omnibox search engine.",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq57RRT6tW6k+UekznZSL/d1qiHP6+5sboz+WPO0s8h/Y7R5vam9Cki/4Ri+qxURWMcVWDcZjMKGGNECkNBtZoR5bIofhTeuzf/nfhd3J7w/XVFgix6FeNk/sIAMfArt2Px5LDrhnC+iffIuWtCQhr/IdVfobTYR7b7f6Tx6TpK+LI6CxCl4+xnpxwVma9uXAH3WhRfz9i/Xl8LJtSslVEaXV4w7SwegzSR7mU7aRncEVC3v/o+S35I8EC16owTSWYp/Zj2IEhfDLgMthqrMF+R5YALtOqJlbLmhoAxVTU8ISjR/fEZoJKNdmqcdM/xssNSPdyr1lT+2HjfY2ZxFnOwIDAQAB",
   "icons": {

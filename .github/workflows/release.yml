@@ -1,7 +1,7 @@
 name: Release
-# Pushing a tag v<version> builds the extension zip and opens a DRAFT release
-# with the matching docs/release-notes/v<version>.md. The maintainer publishes it.
-# Re-pushing the same tag replaces an existing draft; a published release is never touched.
+# Pushing a tag v<version> builds the extension zip and publishes the release
+# with the matching docs/release-notes/v<version>.md. A leftover draft for the
+# same tag is replaced; a release that is already published is never touched.
 on:
   push:
     tags: ['v*']
@@ -35,7 +35,7 @@ jobs:
           name: zambodi-search-${{ github.ref_name }}
           path: dist/*.zip
           if-no-files-found: error
-      - name: Draft the release
+      - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -44,6 +44,6 @@ jobs:
           elif gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
             echo "release $GITHUB_REF_NAME is already published; not touching it"; exit 0
           fi
-          gh release create "$GITHUB_REF_NAME" dist/*.zip --draft \
+          gh release create "$GITHUB_REF_NAME" dist/*.zip --latest \
             --title "Zambodi Search $GITHUB_REF_NAME" \
             --notes-file "docs/release-notes/$GITHUB_REF_NAME.md"
