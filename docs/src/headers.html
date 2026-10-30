@@ -64,7 +64,6 @@
     'screenshots':     ['3', '--yellow', 'Screenshots', 'of the empire', 'google.com, a results page and the popup, rebranded', 'zambodi images'],
     'new-tab':         ['4', '--green',  'New tab page', 'circa 2004', 'Wordmark, search box, two buttons, a tabs row', 'zambodi homepage 2004'],
     'how-it-works':    ['5', '--blue',   'How it works', 'inside', 'CSS at document_start, a TreeWalker and a MutationObserver', 'treewalker mutationobserver'],
-    'regenerate':      ['6', '--red',    'Regenerate', 'the images', 'Every picture on this page comes from a script in docs/src', 'node docs/src/render-*.mjs'],
   }
   const slug = new URLSearchParams(location.search).get('slug') || 'install'
   const [letter, colour, title, tail, sub, query] = window.HEADERS[slug]
