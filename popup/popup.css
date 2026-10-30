@@ -1,0 +1,44 @@
+/* Zambodi popup: same plain 2000s look as the new tab page. */
+html, body {
+  margin: 0;
+  background: #ffffff;
+}
+
+body {
+  width: 260px;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  color: #000000;
+  padding: 8px 0 10px;
+  text-align: center;
+}
+
+#logo {
+  display: block;
+  margin: 0 auto 6px;
+}
+
+#box {
+  margin: 0 10px;
+  padding: 7px 8px 6px;
+  text-align: left;
+  background: #e5ecf9;
+  border-top: 1px solid #3366cc;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  cursor: default;
+}
+
+input[type="checkbox"] {
+  margin: 0 4px 0 0;
+  vertical-align: -2px;
+}
+
+#note {
+  margin: 5px 0 0 21px;
+  font-size: 11px;
+  color: #676767;
+}

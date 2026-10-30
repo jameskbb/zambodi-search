@@ -1,0 +1,9 @@
+{
+  "name": "zambodi-search-docs",
+  "private": true,
+  "description": "Renders the README title card, section headers, screenshots and demo video. Not part of the extension.",
+  "type": "module",
+  "devDependencies": {
+    "playwright-core": "1.63.0"
+  }
+}

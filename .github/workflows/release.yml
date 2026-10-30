@@ -1,0 +1,30 @@
+name: Release
+# Pushing a tag v<version> builds the extension zip and opens a DRAFT release
+# with the matching docs/release-notes/v<version>.md. The maintainer publishes it.
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Tag must match manifest.json version
+        run: |
+          v=$(node -p "require('./manifest.json').version")
+          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "tag $GITHUB_REF_NAME but manifest says $v"; exit 1; }
+          [ -f "docs/release-notes/$GITHUB_REF_NAME.md" ] || { echo "missing docs/release-notes/$GITHUB_REF_NAME.md"; exit 1; }
+      - run: scripts/check.sh
+      - run: scripts/package.sh
+      - name: Draft the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.zip --draft \
+            --title "Zambodi Search $GITHUB_REF_NAME" \
+            --notes-file "docs/release-notes/$GITHUB_REF_NAME.md"

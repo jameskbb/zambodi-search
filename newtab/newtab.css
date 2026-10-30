@@ -1,0 +1,84 @@
+/* Zambodi new tab page: the circa 2005 search homepage, kept deliberately plain. */
+html, body {
+  margin: 0;
+  background: #ffffff;
+  color: #000000;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  padding: 3px 8px 8px;
+}
+
+a:link { color: #0000cc; }
+a:visited { color: #551a8b; }
+a:active { color: #ff0000; }
+
+#gbar {
+  text-align: right;
+  font-size: 13px;
+  padding-top: 2px;
+}
+
+#logo {
+  display: block;
+  margin: 46px auto 22px;
+  border: 0;
+}
+
+#sbox { width: 100%; }
+#sbox td { vertical-align: top; }
+#sbox .side { width: 50%; }
+#sbox .mid { text-align: center; padding: 0 2px; white-space: nowrap; }
+
+#tabs {
+  font-size: 13px;
+  text-align: left;
+  width: 387px;
+  margin: 0 auto 4px;
+  white-space: nowrap;
+}
+
+#q {
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  width: 383px;
+  padding: 2px 1px;
+  margin: 0;
+  border: 1px solid #999999;
+  border-top-color: #666666;
+  border-radius: 0;
+  background: #ffffff;
+  outline: none;
+}
+
+#btns { margin-top: 7px; white-space: nowrap; }
+
+/* Period push buttons: flat grey face with a raised 3D border. */
+.btn {
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  color: #000000;
+  background: #ece9d8;
+  border: 2px outset #f4f2ea;
+  border-radius: 0;
+  padding: 1px 6px;
+  margin: 0 2px;
+  cursor: default;
+}
+
+.btn:active { border-style: inset; }
+.btn:focus { outline: 1px dotted #000000; outline-offset: -4px; }
+
+#opts {
+  font-size: 10px;
+  text-align: left;
+  padding: 21px 0 0 6px;
+  line-height: 13px;
+  white-space: nowrap;
+}
+
+#foot { margin-top: 40px; }
+#foot p { margin: 0 0 12px; font-size: 13px; }
+#foot #copy { font-size: 10px; color: #000000; }

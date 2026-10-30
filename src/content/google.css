@@ -1,0 +1,41 @@
+/*
+ * Flash prevention for google.js, injected at document_start on Google search
+ * pages. Every known logo element is invisible from the first paint until the
+ * script swaps in the Zambodi wordmark. visibility (not display) keeps the
+ * layout box so the script can measure it and nothing shifts.
+ *
+ * The list must match SELECTORS in google.js (a unit test checks). Each
+ * selector is gated on <html> lacking data-zambodi-off, which google.js sets
+ * when the extension is switched off, so the hiding is undone.
+ *
+ * Known trade-off: with the extension switched off, the logo is still hidden
+ * for the few milliseconds before chrome.storage answers and google.js sets
+ * data-zambodi-off. A content-script stylesheet cannot read the flag, and
+ * hiding only after the answer would flash Google's logo on every load in the
+ * common (on) case. See docs/decisions.md, decisions 7 and 8.
+ */
+html:not([data-zambodi-off]) img[alt="Google"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) img[alt="Zambodi"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) svg[aria-label="Google"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) svg[aria-label="Zambodi"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) a[aria-label="Go to Google home"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) a[aria-label="Go to Zambodi home"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) a[aria-label="Google"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) a[aria-label="Zambodi"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) a[title="Google"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) a[title="Zambodi"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) img[title="Google"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) img[title="Zambodi"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) a[title="Go to Google Home"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) a[title="Go to Zambodi Home"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) #hplogo:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) a[href*="oi=ddle"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) img[src*="/logos/doodles/"]:not([data-zambodi-logo]):not([data-zambodi-swapped]),
+html:not([data-zambodi-off]) iframe[src*="/logos/doodles/"]:not([data-zambodi-logo]):not([data-zambodi-swapped]) {
+  visibility: hidden !important;
+}
+
+/* Originals replaced by our logo. */
+html:not([data-zambodi-off]) [data-zambodi-hidden] {
+  display: none !important;
+}

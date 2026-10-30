@@ -1,0 +1,26 @@
+node_modules/
+dist/
+
+# Secrets and per-machine state
+.env*
+*.pem
+*.key
+*.crx
+*.zip
+id_rsa*
+id_ed25519*
+.claude/settings.local.json
+.claude/ai-skills.md
+.claude/worktrees/
+.planning/
+
+# Render scratch
+docs/src/out/
+docs/src/profile/
+
+# Local word list for scripts/check.sh
+scripts/blocklist.local.txt
+
+# Local agent context stays out of public commits.
+CLAUDE.md
+AGENTS.md

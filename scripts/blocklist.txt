@@ -1,0 +1,3 @@
+# Words that must never appear in tracked files or in history, one per line, case-insensitive.
+# scripts/check.sh scans the tree for them; scripts/check.sh --history scans every commit.
+# Words you would rather not publish in this list go in scripts/blocklist.local.txt, which is not tracked.

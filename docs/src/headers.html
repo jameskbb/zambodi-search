@@ -1,0 +1,79 @@
+<!doctype html>
+<!--
+  Source for docs/images/header-<slug>.png, the README section headers.
+  Render with: node docs/src/render-headers.mjs
+
+  1200x160, the title card's family: pinstripe sky, a bevelled letter tile,
+  the section title in the wordmark serif, and a tiny 2000s search box with a
+  query that fits the section. Pick a header with ?slug=<slug>; the list is
+  HEADERS below, which the renderer reads.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Arimo:wght@400;700&display=swap">
+<link rel="stylesheet" href="zambodi.css">
+<style>
+  html, body { width: 1200px; height: 160px; }
+  body {
+    background:
+      radial-gradient(420px 160px at 12% 20%, rgba(255,255,255,.9), transparent 70%),
+      linear-gradient(180deg, #f4f7fc 0%, #e3eaf6 100%);
+    display: flex; align-items: center; overflow: hidden; position: relative; padding: 0 56px 6px;
+  }
+  body::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(51,102,204,.035) 0 1px, transparent 1px 4px);
+  }
+  .stripe { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; display: flex; }
+  .stripe i { flex: 1; background: var(--c); }
+  .tile {
+    flex: 0 0 auto; width: 84px; height: 84px; border-radius: 14px; display: grid; place-items: center;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--c) 55%, #fff) 0%, var(--c) 50%, color-mix(in srgb, var(--c) 75%, #000) 100%);
+    border: 1px solid color-mix(in srgb, var(--c) 60%, #000);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.55), 2px 4px 8px rgba(30,50,90,.25);
+    font: 700 52px/1 'Libre Baskerville', Georgia, serif; color: #fff;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.25), 1px 2px 2px rgba(0,0,0,.25);
+  }
+  .text { margin-left: 26px; flex: 1 1 auto; position: relative; }
+  h2 { font: 700 40px/1.1 'Libre Baskerville', Georgia, serif; letter-spacing: -.015em; color: #222; white-space: nowrap; display: inline-block; }
+  h2 em { font-style: italic; font-weight: 400; color: color-mix(in srgb, var(--c) 82%, #000); }
+  .sub { margin-top: 8px; font-size: 17px; color: #555; }
+  .mini { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; position: relative; }
+  .mini .row { display: flex; align-items: center; gap: 8px; }
+  .mini .wordmark { width: 110px; height: 36px; }
+  .mini .searchbox { margin-top: 0; width: 260px; font-family: 'Arimo', monospace; }
+  .mini .buttons { margin-top: 0; }
+</style>
+</head>
+<body>
+  <div class="tile" id="tile"></div>
+  <div class="text"><h2 id="title"></h2><div class="sub" id="sub"></div></div>
+  <div class="mini">
+    <div class="row"><div class="wordmark" role="img" aria-label="Zambodi"></div></div>
+    <div class="row"><div class="searchbox" id="query"></div><div class="buttons"><span>Zambodi Search</span></div></div>
+  </div>
+  <div class="stripe"><i style="--c:var(--blue)"></i><i style="--c:var(--red)"></i><i style="--c:var(--yellow)"></i><i style="--c:var(--blue)"></i><i style="--c:var(--green)"></i><i style="--c:var(--red)"></i><i style="--c:var(--blue)"></i></div>
+<script>
+  // slug: [tile letter, colour, title, italic tail, subtitle, search box query]
+  window.HEADERS = {
+    'install':         ['1', '--blue',   'Install', 'in three clicks', 'Load it unpacked from chrome://extensions', 'how to load unpacked extension'],
+    'what-it-changes': ['2', '--red',    'What it changes', 'and how', 'Text, logo, favicon, title, new tab, omnibox, toggle', 'what does zambodi do'],
+    'screenshots':     ['3', '--yellow', 'Screenshots', 'of the empire', 'google.com and the popup, rebranded', 'zambodi images'],
+    'new-tab':         ['4', '--green',  'New tab page', 'circa 2004', 'Wordmark, search box, two buttons, a tabs row', 'zambodi homepage 2004'],
+    'how-it-works':    ['5', '--blue',   'How it works', 'inside', 'CSS at document_start, a TreeWalker and a MutationObserver', 'treewalker mutationobserver'],
+    'regenerate':      ['6', '--red',    'Regenerate', 'the images', 'Every picture on this page comes from a script in docs/src', 'node docs/src/render-*.mjs'],
+  }
+  const slug = new URLSearchParams(location.search).get('slug') || 'install'
+  const [letter, colour, title, tail, sub, query] = window.HEADERS[slug]
+  document.body.style.setProperty('--c', `var(${colour})`)
+  document.getElementById('tile').textContent = letter
+  document.getElementById('title').innerHTML = `${title} <em>${tail}</em>`
+  document.getElementById('sub').textContent = sub
+  document.getElementById('query').innerHTML = `${query}<i class="caret"></i>`
+</script>
+<script src="wordmark.js"></script>
+</body>
+</html>
