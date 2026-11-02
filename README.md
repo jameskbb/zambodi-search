@@ -2,6 +2,13 @@
 
 ![Zambodi Search title card: the word "Zambodi" in bevelled serif letters coloured blue, red, yellow, blue, green, red and blue, the line "The search engine that exists in exactly one browser.", and a 2000s browser window showing a Zambodi homepage with a search box, a "Zambodi Search" button and an "I'm Feeling Lucky" button](docs/images/readme-title-zambodi.png)
 
+<p align="center">
+  <a href="https://github.com/jameskbb/zambodi-search/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/jameskbb/zambodi-search/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI"></a>
+  <a href="https://github.com/jameskbb/zambodi-search/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/jameskbb/zambodi-search?sort=semver&style=for-the-badge&logo=github&logoColor=white&label=Release&color=2e6b4e"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/jameskbb/zambodi-search?style=for-the-badge&label=License&color=blue"></a>
+  <a href="manifest.json"><img alt="Chrome MV3" src="https://img.shields.io/badge/Chrome-Manifest%20V3-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
+</p>
+
 Zambodi Search is a Chrome extension that rebrands Google as Zambodi, a search
 engine that exists in exactly one browser: yours. Every "Google" on every page
 becomes "Zambodi", google.com wears a bevelled 2000s-style Zambodi wordmark, the
