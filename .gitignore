@@ -10,7 +10,6 @@ dist/
 id_rsa*
 id_ed25519*
 .claude/settings.local.json
-.claude/ai-skills.md
 .claude/worktrees/
 .planning/
 
@@ -23,7 +22,3 @@ scripts/blocklist.local.txt
 
 # Local design-hook configuration
 .impeccable/
-
-# Local agent context stays out of public commits.
-CLAUDE.md
-AGENTS.md

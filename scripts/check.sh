@@ -77,10 +77,8 @@ fi
 
 fail=0
 
-# Agent rules: when present, the two files are identical. The public companion has neither.
-if [ -f CLAUDE.md ] || [ -f AGENTS.md ]; then
-  cmp -s CLAUDE.md AGENTS.md || { echo "FAIL: CLAUDE.md and AGENTS.md differ"; fail=1; }
-fi
+# Agent rules: the two files exist and are identical.
+cmp -s CLAUDE.md AGENTS.md || { echo "FAIL: CLAUDE.md and AGENTS.md differ or are missing"; fail=1; }
 
 # Public-safety: no private network identifiers, machine paths, em dashes or blocklisted words in tracked files.
 node -e "$scan_js" tree || fail=1
